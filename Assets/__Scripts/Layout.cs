@@ -34,7 +34,7 @@ public class Layout : MonoBehaviour {
         multipier.y = float.Parse(xml["multiplier"][0].att("y"));
 
         SlotDef tSD;
-        PT_XMLHashList slotsX = xml["slots"];
+        PT_XMLHashList slotsX = xml["slot"];
 
         for (int i = 0; i<slotsX.Count; i++)
         {
