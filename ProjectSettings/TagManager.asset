@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - HighScore
+  - RoundResult
+  - GameOver
+  - Scoreboard
   layers:
   - Default
   - TransparentFX

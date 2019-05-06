@@ -17,7 +17,7 @@ public class CardProspector : Card {
     public int layoutID;
     public SlotDef slotDef;
 
-    public override void OnMouseUpAsButton()
+    override public void OnMouseUpAsButton()
     {
         Prospector.S.CardClicked(this);
         base.OnMouseUpAsButton();

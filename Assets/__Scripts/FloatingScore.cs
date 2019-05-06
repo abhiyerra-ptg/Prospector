@@ -14,6 +14,7 @@ public class FloatingScore : MonoBehaviour {
     [Header("Set Dynamically")]
 
     public eFSState state = eFSState.idle;
+
     [SerializeField]
     protected int _score = 0;
     public string scoreString;
@@ -28,9 +29,11 @@ public class FloatingScore : MonoBehaviour {
         {
             _score = value;
             scoreString = _score.ToString("N0");
+
             GetComponent<Text>().text = scoreString;
         }
     }
+
     public List<Vector2> bezierPts;
     public List<float> fontSizes;
     public float timeStart = -1f;
@@ -38,6 +41,7 @@ public class FloatingScore : MonoBehaviour {
     public string easingCurve = Easing.InOut;
 
     public GameObject reportFinishTo = null;
+
     private RectTransform rectTrans;
     private Text txt;
 
@@ -45,17 +49,21 @@ public class FloatingScore : MonoBehaviour {
     {
         rectTrans = GetComponent<RectTransform>();
         rectTrans.anchoredPosition = Vector2.zero;
+
         txt = GetComponent<Text>();
+
         bezierPts = new List<Vector2>(ePts);
-        if(ePts.Count == 1)
+
+        if (ePts.Count == 1)
         {
             transform.position = ePts[0];
             return;
         }
-        if (eTimeS == 0)
-            eTimeS = Time.time;
+
+        if (eTimeS == 0) eTimeS = Time.time;
         timeStart = eTimeS;
         timeDuration = eTimeD;
+
         state = eFSState.pre;
     }
     public void FSCallback(FloatingScore fs)
@@ -65,13 +73,16 @@ public class FloatingScore : MonoBehaviour {
     void Update()
     {
         if (state == eFSState.idle) return;
+
         float u = (Time.time - timeStart) / timeDuration;
+
         float uC = Easing.Ease(u, easingCurve);
         if (u < 0)
         {
             state = eFSState.pre;
             txt.enabled = false;
         }
+
         else
         {
             if (u >= 1)
@@ -80,21 +91,25 @@ public class FloatingScore : MonoBehaviour {
                 state = eFSState.post;
                 if(reportFinishTo != null)
                 {
+
                     reportFinishTo.SendMessage("FSCallback", this);
+
                     Destroy(gameObject);
                 }
+
                 else
                 {
                     state = eFSState.idle;
                 }
-
             }
             else
             {
                 state = eFSState.active;
                 txt.enabled = true;
             }
+
             Vector2 pos = Utils.Bezier(uC, bezierPts);
+
             rectTrans.anchorMin = rectTrans.anchorMax = pos;
             if(fontSizes != null && fontSizes.Count > 0)
             {

@@ -10,8 +10,9 @@ public class Prospector : MonoBehaviour {
 	static public Prospector 	S;
 
 	[Header("Set in Inspector")]
-	public TextAsset			deckXML;
+	public TextAsset deckXML;
     public TextAsset layoutXML;
+
     public float xOffset = 3;
     public float yOffset = -2.5f;
     public Vector3 layoutCenter;
@@ -20,17 +21,22 @@ public class Prospector : MonoBehaviour {
     public Vector2 fsPosRun = new Vector2(0.5f, 0.75f);
     public Vector2 fsPosMid2 = new Vector2(0.4f, 1.0f);
     public Vector2 fsPosEnd = new Vector2(0.5f, 0.95f);
+
     public float reloadDelay = 2f;
+
     public Text gameOverText, roundResultText, highScoreText;
 
     [Header("Set Dynamically")]
-	public Deck					deck;
+	public Deck	deck;
     public Layout layout;
+
     public List<CardProspector> drawPile;
+
     public Transform layoutAnchor;
     public CardProspector target;
     public List<CardProspector> tableau;
     public List<CardProspector> discardPile;
+
     public FloatingScore fsRun;
 
 	void Awake(){
@@ -48,11 +54,17 @@ public class Prospector : MonoBehaviour {
         int highScore = ScoreManager.HIGH_SCORE;
         string hScore = "High Score:" + Utils.AddCommasToNumber(highScore);
         go.GetComponent<Text>().text = hScore;
+
         go = GameObject.Find("GameOver");
         if(go != null)
         {
             gameOverText = go.GetComponent<Text>();
 
+        }
+        go = GameObject.Find("RoundResult");
+        if(go != null)
+        {
+            roundResultText = go.GetComponent<Text>();
         }
             ShowResultsUI(false);
         
@@ -64,6 +76,7 @@ public class Prospector : MonoBehaviour {
     }
 	void Start() {
         Scoreboard.S.score = ScoreManager.SCORE;
+
         deck = GetComponent<Deck> ();
 		deck.InitDeck (deckXML.text);
         Deck.Shuffle(ref deck.cards);
@@ -76,7 +89,9 @@ public class Prospector : MonoBehaviour {
 
         layout = GetComponent<Layout>();
         layout.ReadLayout(layoutXML.text);
+
         drawPile = ConvertListCardsToListCardProspectors(deck.cards);
+
         LayoutGame();
 	}
 
@@ -115,11 +130,13 @@ public class Prospector : MonoBehaviour {
             cp = Draw();
             cp.faceUp = tSD.faceUp;
             cp.transform.parent = layoutAnchor;
-            cp.transform.localPosition = new Vector3(layout.multipier.x*tSD.x, layout.multipier.y*tSD.y,-tSD.layerID);
+            cp.transform.localPosition = new Vector3(layout.multiplier.x*tSD.x, layout.multiplier.y*tSD.y,-tSD.layerID);
             cp.layoutID = tSD.id;
             cp.slotDef = tSD;
             cp.state = eCardState.tableau;
+
             cp.SetSortingLayerName(tSD.layerName);
+
             tableau.Add(cp);
         }
 
@@ -145,6 +162,7 @@ public class Prospector : MonoBehaviour {
                 return (tCP);
             }
         }
+
         return (null);
     }
 
@@ -169,8 +187,10 @@ public class Prospector : MonoBehaviour {
         cd.state = eCardState.discard;
         discardPile.Add(cd);
         cd.transform.parent = layoutAnchor;
-        cd.transform.localPosition = new Vector3(layout.multipier.x*layout.discardPile.x, layout.multipier.y*layout.discardPile.y, -layout.discardPile.layerID+0.5f);
+
+        cd.transform.localPosition = new Vector3(layout.multiplier.x*layout.discardPile.x, layout.multiplier.y*layout.discardPile.y, -layout.discardPile.layerID+0.5f);
         cd.faceUp = true;
+
         cd.SetSortingLayerName(layout.discardPile.layerName);
         cd.SetSortOrder(-100 + discardPile.Count);
 
@@ -181,22 +201,28 @@ public class Prospector : MonoBehaviour {
         target = cd;
         cd.state = eCardState.target;
         cd.transform.parent = layoutAnchor;
-        cd.transform.localPosition = new Vector3(layout.multipier.x * layout.discardPile.x, layout.multipier.y * layout.discardPile.y, -layout.discardPile.layerID);
+
+        cd.transform.localPosition = new Vector3(layout.multiplier.x * layout.discardPile.x, layout.multiplier.y * layout.discardPile.y, -layout.discardPile.layerID);
         cd.faceUp = true;
+
         cd.SetSortingLayerName(layout.discardPile.layerName);
         cd.SetSortOrder(0);
     }
     void UpdateDrawPile()
     {
         CardProspector cd;
-        for(int i = 0; i<drawPile.Count; i++)
+
+        for (int i = 0; i<drawPile.Count; i++)
         {
             cd = drawPile[i];
             cd.transform.parent = layoutAnchor;
+
             Vector2 dpStagger = layout.drawPile.stagger;
-            cd.transform.localPosition = new Vector3(layout.multipier.x * (layout.drawPile.x + i * dpStagger.x), layout.multipier.y * (layout.drawPile.y + i * dpStagger.y), -layout.drawPile.layerID + 0.1f * i);
+            cd.transform.localPosition = new Vector3(layout.multiplier.x * (layout.drawPile.x + i * dpStagger.x), layout.multiplier.y * (layout.drawPile.y + i * dpStagger.y), -layout.drawPile.layerID + 0.1f * i);
+
             cd.faceUp = false;
             cd.state = eCardState.drawpile;
+
             cd.SetSortingLayerName(layout.drawPile.layerName);
             cd.SetSortOrder(-10 * i);
         }
@@ -212,10 +238,15 @@ public class Prospector : MonoBehaviour {
                 MoveToDiscard(target);
                 MoveToTarget(Draw());
                 UpdateDrawPile();
+
                 ScoreManager.EVENT(eScoreEvent.draw);
+
                 FloatingScoreHandler(eScoreEvent.draw);
+
                 break;
+
             case eCardState.tableau:
+
                 bool validMatch = true;
                 if (!cd.faceUp)
                 {
@@ -226,26 +257,34 @@ public class Prospector : MonoBehaviour {
                     validMatch = false;
                 }
                 if (!validMatch) return;
+
                 tableau.Remove(cd);
                 MoveToTarget(cd);
+
                 SetTableauFaces();
+
                 ScoreManager.EVENT(eScoreEvent.mine);
+
                 FloatingScoreHandler(eScoreEvent.mine);
+
                 break;
         }
         CheckForGameOver();
     }
     void CheckForGameOver()
     {
-        if(tableau.Count == 0)
+
+        if (tableau.Count == 0)
         {
             GameOver(true);
             return;
         }
+
         if (drawPile.Count > 0)
         {
             return;
         }
+
         foreach(CardProspector cd in tableau)
         {
             if (AdjacentRank(cd, target))
@@ -253,6 +292,7 @@ public class Prospector : MonoBehaviour {
                 return;
             }
         }
+
         GameOver(false);
     }
 
@@ -260,13 +300,16 @@ public class Prospector : MonoBehaviour {
     {
         int score = ScoreManager.SCORE;
         if (fsRun != null) score += fsRun.score;
+
         if (won)
         {
             gameOverText.text = "Round Over";
             roundResultText.text = "You won this round!\nRound Score: " + score;
             ShowResultsUI(true);
+            
             //print("Game Over. You won!");
             ScoreManager.EVENT(eScoreEvent.gameWin);
+
             FloatingScoreHandler(eScoreEvent.gameWin);
         }
         else
@@ -282,8 +325,10 @@ public class Prospector : MonoBehaviour {
                 roundResultText.text = "Your final score was: " + score;
             }
             ShowResultsUI(true);
+            
             //print("Game Over. You lost. :(");
             ScoreManager.EVENT(eScoreEvent.gameLoss);
+
             FloatingScoreHandler(eScoreEvent.gameLoss);
         }
         //SceneManager.LoadScene("_Prospector_Scene_0");
@@ -297,12 +342,16 @@ public class Prospector : MonoBehaviour {
     public bool AdjacentRank(CardProspector c0, CardProspector c1)
     {
         if (!c0.faceUp || !c1.faceUp) return (false);
-        if(Mathf.Abs(c0.rank - c1.rank) == 1)
+
+        if (Mathf.Abs(c0.rank - c1.rank) == 1)
         {
             return (true);
         }
+
         if (c0.rank == 1 && c1.rank == 13) return (true);
         if (c0.rank == 13 && c1.rank == 1) return (true);
+
+
         return (false);
     }
 
@@ -314,20 +363,26 @@ public class Prospector : MonoBehaviour {
             case eScoreEvent.draw:
             case eScoreEvent.gameWin:
             case eScoreEvent.gameLoss:
+
                 if(fsRun != null){
+
                     fsPts = new List<Vector2>();
                     fsPts.Add(fsPosRun);
                     fsPts.Add(fsPosMid2);
                     fsPts.Add(fsPosEnd);
                     fsRun.reportFinishTo = Scoreboard.S.gameObject;
                     fsRun.Init(fsPts, 0, 1);
+
                     fsRun.fontSizes = new List<float>(new float[] { 28, 36, 4 });
                     fsRun = null;
 
                 }
                 break;
+
             case eScoreEvent.mine:
+
                 FloatingScore fs;
+
                 Vector2 p0 = Input.mousePosition;
                 p0.x /= Screen.width;
                 p0.y /= Screen.height;

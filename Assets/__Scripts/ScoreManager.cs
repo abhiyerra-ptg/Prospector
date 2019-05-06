@@ -15,29 +15,30 @@ public class ScoreManager : MonoBehaviour {
     static private ScoreManager S;
     static public int SCORE_FROM_PREV_ROUND = 0;
     static public int HIGH_SCORE = 0;
+
     [Header("Set Dynamically")]
+
     public int chain = 0;
     public int scoreRun = 0;
     public int score = 0;
-	// Use this for initialization
+
 	void Awake () {
         if(S == null)
         {
             S = this;
-
         }
         else
         {
             Debug.LogError("ERROR: ScoreManager.Awake(): S is already set!");
         }
+
         if (PlayerPrefs.HasKey("ProspectorHighScore"))
         {
             HIGH_SCORE = PlayerPrefs.GetInt("ProspectorHighScore");
-
         }
+
         score += SCORE_FROM_PREV_ROUND;
         SCORE_FROM_PREV_ROUND = 0;
-		
 	}
 
     static public void EVENT(eScoreEvent evt)
@@ -48,7 +49,7 @@ public class ScoreManager : MonoBehaviour {
         }
         catch(System.NullReferenceException nre)
         {
-            Debug.LogError("ScoreManager: EVENT() called while S=null.\n" + nre);
+            Debug.LogError("ScoreManager:EVENT() called while S=null.\n" + nre);
         }
     }
 
@@ -68,31 +69,34 @@ public class ScoreManager : MonoBehaviour {
                 scoreRun += chain;
                 break;
         }
+
         switch (evt)
         {
             case eScoreEvent.gameWin:
+
                 SCORE_FROM_PREV_ROUND = score;
                 print("You won this round! Round score: " + score);
                 break;
+
             case eScoreEvent.gameLoss:
                 if(HIGH_SCORE <= score)
                 {
                     print("You got the high score! High score: " + score);
                     HIGH_SCORE = score;
                     PlayerPrefs.SetInt("ProspectorHighScore", score);
-
                 }
+
                 else
                 {
                     print("Your final score for the game was:" + score);
                 }
                 break;
+
             default:
                 print("score: " + score + " scoreRun: " + scoreRun + " chain: " + chain);
                 break;
         }
-
-        }
+    }
     static public int CHAIN
     {
         get
